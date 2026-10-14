@@ -1,9 +1,25 @@
 {
-  "asset": "web-20261014-152154.zip",
-  "sha256": "de5b98087085f03a8dcf62348dc56507a53b5af8f0133c803e56246ef809a06e",
-  "source_commit": "58b70e423ddc96612f3c0e018675557d46112d42",
+  "asset": "web-20261014-152652.zip",
+  "sha256": "844e756f1166a1f8cc6e89d01824991c22fd0cd98eb2dd4a3692fab133d56166",
+  "source_commit": "974f7249fa6f1755057d42fc9229615b7bd12aa9",
   "built_utc": "2026-10-14T15:21:21.8796357Z",
-  "bytes": 297608250,
-  "tag": "web-20261014-152154",
+  "bytes": 595200455,
+  "previous": [
+    {
+      "asset": "web-20261014-152154.zip",
+      "sha256": "de5b98087085f03a8dcf62348dc56507a53b5af8f0133c803e56246ef809a06e",
+      "source_commit": "58b70e423ddc96612f3c0e018675557d46112d42",
+      "built_utc": "2026-10-14T15:21:21.8796357Z",
+      "bytes": 297608250,
+      "tag": "web-20261014-152154",
+      "url": "https://coolbeangames.github.io/Remnant-Unity-Web/"
+    },
+    {
+      "tag": "web-20261014-151441",
+      "asset": "web-20261014-151441.zip",
+      "sha256": "c30e7380f9ccda387d1d63461b3119a2ff4a00437453769bd8fb3a0e02bef1dc"
+    }
+  ],
+  "tag": "web-20261014-152652",
   "url": "https://coolbeangames.github.io/Remnant-Unity-Web/"
 }
