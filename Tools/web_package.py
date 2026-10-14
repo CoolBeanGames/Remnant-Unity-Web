@@ -16,24 +16,37 @@ def validate(folder):
     assert sum(p.stat().st_size for p in actual.values())<LIMIT,'Pages size limit exceeded'
     for name,expected in manifest['files'].items():assert digest(actual[name].read_bytes())==expected,name
     return manifest
-def package(folder,output,commit):
+def package(folder,output,commit,previous=()):
     build=json.loads((folder/'build.json').read_text())
     source=json.loads((folder/'source.json').read_text())
     for name,expected in source['sha256'].items():
         if name.startswith(('Assets/','Packages/')):assert digest((ROOT/name).read_bytes())==expected,'Rebuild changed input: '+name
     assert build['errors']==0,'Build contains errors'
-    files={}
+    files={};retained=[]
+    for bundle in previous:
+        with zipfile.ZipFile(bundle) as archive:
+            old=json.loads(archive.read('game-build.json'))
+            for name in old.get('current_files',old['files']):
+                if not name.startswith(('Build/','StreamingAssets/','TemplateData/')):continue
+                path=pathlib.PurePosixPath(name)
+                assert not path.is_absolute() and '..' not in path.parts and '\\' not in name and ':' not in name
+                data=archive.read(name);assert digest(data)==old['files'][name],name
+                files[name]=data
+            retained.append({'source_commit':old['source_commit'],'built_utc':old['built_utc']})
+    current=[]
     for p in folder.rglob('*'):
         if not p.is_file():continue
         name=p.relative_to(folder).as_posix()
         if name=='index.html' or name.startswith(('Build/','StreamingAssets/','TemplateData/')):
             assert digest(p.read_bytes())==build['files'][name],name
             files[name]=p.read_bytes()
+            current.append(name)
     assert files and 'index.html' in files
     files['.nojekyll']=b''
     manifest={'project':'Remnant Unity','unity':build['unity'],'built_utc':build['utc'],
               'source_commit':commit,'build_source_commit':source['source_commit'],
               'mode':build['mode'],'build_warnings':build['warnings'],
+              'current_files':sorted(current+['.nojekyll']),'retained_builds':retained,
               'files':{name:digest(data) for name,data in sorted(files.items())}}
     files['game-build.json']=(json.dumps(manifest,indent=2)+'\n').encode()
     assert sum(map(len,files.values()))<LIMIT,'Pages size limit exceeded'
