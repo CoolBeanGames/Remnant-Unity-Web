@@ -1,0 +1,39 @@
+name: Playable browser build
+on:
+  push:
+    branches: [main]
+    paths: ['WebRelease/current.json', '.github/workflows/web-pages.yml', 'Tools/web_package.py']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and validate compiled game
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, pathlib, subprocess
+          from Tools.web_package import extract
+          p=json.loads(pathlib.Path('WebRelease/current.json').read_text())
+          subprocess.run(['gh','release','download',p['tag'],'--pattern',p['asset'],'--dir','download'],check=True)
+          extract(pathlib.Path('download')/p['asset'],pathlib.Path('_site'),p['sha256'])
+          PY
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Deploy game
+        id: deployment
+        uses: actions/deploy-pages@v4
