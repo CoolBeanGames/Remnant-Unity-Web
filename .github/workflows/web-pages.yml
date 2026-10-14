@@ -18,7 +18,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Download and validate compiled game
         env:
           GH_TOKEN: ${{ github.token }}
@@ -31,7 +31,7 @@ jobs:
           extract(pathlib.Path('download')/p['asset'],pathlib.Path('_site'),p['sha256'])
           PY
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: _site
       - name: Deploy game
